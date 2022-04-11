@@ -1,0 +1,6 @@
+Notes Regarding project
+
+Problems with python 3.10 building pandas wheels when installing fastquant library
+Solution:
+Use Python 3.9
+
