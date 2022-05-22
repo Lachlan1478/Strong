@@ -31,14 +31,18 @@ class Init():
         return risk
 
     def Features(self):
-        self.data['5dFutPct'] = self.data['Close'].pct_change(5)
-        #Target
-        Target = self.getTarget(self.data['5dFutPct'], 1)
 
-        #Features
+        self.data['5dFutPct'] = self.data['Close'].pct_change(5)
+        # Features
         FeatureNames = ['5dStdev', '10dStdev', 'Close', 'Volume', 'Market Cap']
         self.data[FeatureNames[0]] = self.getStdev(self.data['5dFutPct'], 5)
         self.data[FeatureNames[1]] = self.getStdev(self.data['5dFutPct'], 10)
+
+        self.data = self.data.sample(frac=1)
+
+        print(self.data)
+        #Target
+        Target = self.getTarget(self.data['5dFutPct'], 0.01)
 
         Features = self.data[FeatureNames]
 
@@ -47,9 +51,7 @@ class Init():
         trainFeat = Features[:size]
         testFeat = Features[size:]
 
-        size = int(0.7 * Target.shape[0])
-
-        trainTarg = Target[:Target]
-        testTarg = Target[Target:]
+        trainTarg = Target[:size]
+        testTarg = Target[size:]
 
         return trainFeat, testFeat, trainTarg, testTarg
