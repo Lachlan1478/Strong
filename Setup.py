@@ -1,6 +1,7 @@
 import pandas as pd
 import statsmodels as sm
 import statistics
+import json
 
 
 class Init():
@@ -10,8 +11,8 @@ class Init():
     def getTarget(self, data, bound):
         temp = []
         for i in range(0, len(data)):
-            if (data[i] > bound):
-                temp.append(2)
+            if (data[i] >= bound):
+                temp.append(1)
             elif (data[i] < -bound):
                 temp.append(0)
             else:
@@ -38,13 +39,17 @@ class Init():
         self.data[FeatureNames[0]] = self.getStdev(self.data['5dFutPct'], 5)
         self.data[FeatureNames[1]] = self.getStdev(self.data['5dFutPct'], 10)
 
-        self.data = self.data.sample(frac=1)
+        self.data['Target'] = self.getTarget(self.data['5dFutPct'], 0)
+        self.data.dropna()
+        self.data = self.data.sample(frac=1) # shuffle data
 
         print(self.data)
-        #Target
-        Target = self.getTarget(self.data['5dFutPct'], 0.01)
 
         Features = self.data[FeatureNames]
+
+        #self.data.to_csv('file_name.csv')
+
+        Target = self.data['Target']
 
         size = int(0.7 * Features.shape[0])
 

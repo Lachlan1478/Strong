@@ -1,5 +1,6 @@
 from fastquant import get_crypto_data, get_stock_data
 import Setup
+import NeuralNet
 from cryptocmd import CmcScraper
 
 
@@ -20,8 +21,9 @@ def main():
     #ORG = getData("ORG.AX", "2020-01-01", "2022-01-01", Crypto=False)
     print(BTC)
 
-    M1 = Setup.Init(BTC)
-    a,b,c,d = M1.Features()
+    Model1 = NeuralNet.NN(BTC)
+    Model1.M1()
+
 
 
 # Press the green button in the gutter to run the script.
