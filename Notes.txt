@@ -5,4 +5,7 @@ Solution:
 Use Python 3.9
 
 Initial tests use targets: 0 (less than -bound) 1 (between bounds) and 2 (greater than bound)
+
 potentially taking the log ofthe percentage change in price may be a better target for network
+
+keras models requires numpy arrays as input rather than lists (eg solution - self.fTest = np.asarray(self.fTest).astype('float32'))
