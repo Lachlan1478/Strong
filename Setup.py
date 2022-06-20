@@ -3,20 +3,37 @@ import statsmodels as sm
 import statistics
 import json
 
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
+
 
 class Init():
     def __init__(self, data):
         self.data = data
+
+    def oneHot(self, data):
+        ### Categorical data to be converted to numeric data
+        ### integer mapping using LabelEncoder
+        label_encoder = LabelEncoder()
+        integer_encoded = label_encoder.fit_transform(data)
+        integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
+
+        ### One hot encoding
+        onehot_encoder = OneHotEncoder(sparse=False)
+        onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
+
+        print(onehot_encoded)
+
+        return onehot_encoded
+
 
     def getTarget(self, data, bound):
         temp = []
         for i in range(0, len(data)):
             if (data[i] >= bound):
                 temp.append(1)
-            elif (data[i] < -bound):
-                temp.append(0)
             else:
-                temp.append(1)
+                temp.append(0)
         return temp
 
     def getStdev(self, data, period):
@@ -29,21 +46,24 @@ class Init():
                 for j in range(0, period):
                     temp.append(data[i - j])
                 risk.append(statistics.stdev(temp))
+
+            jeff = pd.dataframe(('stddev' + str(period)) = risk)
+            print(jeff)
         return risk
 
     def Features(self):
-
-        self.data['5dFutPct'] = self.data['Close'].pct_change(5)
         # Features
-        FeatureNames = ['5dStdev', '10dStdev', 'Close', 'Volume', 'Market Cap']
+        FeatureNames = ['5dStdev', '10dStdev', 'PctChange', 'VolumePct']
+        self.data['PctChange'] = self.data['Close'].pct_change(5) *100
+        self.data['5dFutPct'] = self.data['PctChange'].shift(5)
         self.data[FeatureNames[0]] = self.getStdev(self.data['5dFutPct'], 5)
         self.data[FeatureNames[1]] = self.getStdev(self.data['5dFutPct'], 10)
+        self.data['VolumePct'] = self.data['Volume'].pct_change(5)*100
 
-        self.data['Target'] = self.getTarget(self.data['5dFutPct'], 0)
+        self.data['Target'] = self.getTarget(self.data['5dFutPct'], 0.01)
+        print(self.data['Target'])
         self.data.dropna()
         self.data = self.data.sample(frac=1) # shuffle data
-
-        print(self.data)
 
         Features = self.data[FeatureNames]
 
